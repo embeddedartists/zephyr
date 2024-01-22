@@ -1,0 +1,22 @@
+#
+# Copyright (c) 2024, Embedded Artists
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+identifier: ea_rt1176_kit_cm4
+name: Embedded Artists iMX RT1176 Kit CM4
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+ram: 128
+flash: 128
+supported:
+  - dma
+  - gpio
+  - i2c
+  - pwm
+vendor: nxp

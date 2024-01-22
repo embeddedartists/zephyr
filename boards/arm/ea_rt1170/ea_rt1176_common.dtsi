@@ -1,0 +1,184 @@
+/*
+ * Copyright 2024, Embedded Artists
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "ea_rt1176_kit-pinctrl.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	aliases {
+		led0 = &led19;
+		led1 = &led3;
+		led2 = &led4;
+		led3 = &led5_red;
+		led4 = &led5_blue;
+		led5 = &led5_green;
+		sw0 = &user_button;
+		eeprom0 = &eeprom;
+
+		pwm-led0 = &pwm_led;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led19: led-1 {
+			gpios = <&gpio9 15 GPIO_ACTIVE_HIGH>;
+			label = "LED19 Green";
+		};
+
+		led3: led-2 {
+			gpios = <&pcal6416a 14 GPIO_ACTIVE_HIGH>;
+			label = "LED3 Red";
+		};
+
+		led4: led-3 {
+			gpios = <&pcal6416a 15 GPIO_ACTIVE_HIGH>;
+			label = "LED4 Green";
+		};
+
+		led5_red: led-4 {
+			gpios = <&pcal6416a 4 GPIO_ACTIVE_HIGH>;
+			label = "RGB LED Red";
+		};
+
+		led5_blue: led-5 {
+			gpios = <&pcal6416a 5 GPIO_ACTIVE_HIGH>;
+			label = "RGB LED Blue";
+		};
+
+		led5_green: led-6 {
+			gpios = <&pcal6416a 6 GPIO_ACTIVE_HIGH>;
+			label = "RGB LED Green";
+		};
+
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		user_button: button-1 {
+			gpios = <&pcal6416a 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "User SW6";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+	};
+
+	pwmleds {
+		compatible = "pwm-leds";
+
+		pwm_led: pwm_led {
+			pwms = <&flexpwm1_pwm2 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		};
+	};
+
+};
+
+&lpi2c5 {
+	status = "okay";
+	pinctrl-0 = <&pinmux_lpi2c5>;
+	pinctrl-names = "default";
+
+	eeprom: at24@55 {
+		compatible = "atmel,at24";
+		reg = <0x55>;
+		size = <8192>;
+		pagesize = <32>;
+		address-width = <16>;
+		timeout = <5>;
+	};
+};
+
+&lpi2c6 {
+	status = "okay";
+	pinctrl-0 = <&pinmux_lpi2c6>;
+	pinctrl-names = "default";
+
+	pcal6416a: pcal6416a@21 {
+		compatible = "nxp,pcal6416a";
+
+		reg = <0x21>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		ngpios = <16>;
+		int-gpios = <&gpio9 11 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+	};
+
+};
+
+&flexpwm1_pwm2 {
+	status = "okay";
+	pinctrl-0 = <&pinmux_flexpwm1>;
+	pinctrl-names = "default";
+};
+
+&lpspi1 {
+	pinctrl-0 = <&pinmux_lpspi1>;
+	pinctrl-names = "default";
+};
+
+&lpadc0 {
+	pinctrl-0 = <&pinmux_lpadc0>;
+	pinctrl-names = "default";
+};
+
+&flexspi {
+	pinctrl-0 = <&pinmux_flexspi1>;
+	pinctrl-names = "default";
+};
+
+&flexspi {
+	status = "okay";
+	ahb-prefetch;
+	ahb-read-addr-opt;
+	rx-clock-source = <1>;
+	reg = <0x400cc000 0x4000>, <0x30000000 DT_SIZE_M(16)>;
+	is25wp128: is25wp128@0 {
+		compatible = "nxp,imx-flexspi-nor";
+		size = <134217728>;
+		reg = <0>;
+		spi-max-frequency = <133000000>;
+		status = "okay";
+		jedec-id = [9d 70 17];
+		erase-block-size = <4096>;
+		write-block-size = <1>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			boot_partition: partition@0 {
+				label = "mcuboot";
+				reg = <0x00000000 DT_SIZE_K(128)>;
+			};
+			/* Note slot 0 has one additional sector,
+			 * this is intended for use with the swap move algorithm
+			 */
+			slot0_partition: partition@20000 {
+				label = "image-0";
+				reg = <0x00020000 0x301000>;
+			};
+			slot1_partition: partition@321000 {
+				label = "image-1";
+				reg = <0x00321000 0x300000>;
+			};
+			scratch_partition: partition@621000 {
+				label = "image-scratch";
+				reg = <0x00621000 DT_SIZE_K(128)>;
+			};
+			storage_partition: partition@641000 {
+				label = "storage";
+				reg = <0x00641000 DT_SIZE_K(1856)>;
+			};
+		};
+	};
+};
+
+&pxp {
+	status = "okay";
+};

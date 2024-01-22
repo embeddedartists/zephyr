@@ -1,0 +1,64 @@
+/*
+ * Copyright 2024, Embedded Artists
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <nxp/nxp_rt11xx_cm4.dtsi>
+#include "ea_rt1176_common.dtsi"
+
+/ {
+	model = "Embedded Artists iMX RT1176 Kit";
+	compatible = "nxp,mimxrt1176";
+
+	chosen {
+		/*
+		 * Note: when using DMA, the SRAM region must be set to
+		 * a memory region that is not cached by the chip. If the chosen
+		 * sram region is changed and DMA is in use, you will
+		 * encounter issues!
+		 */
+		zephyr,sram = &sram1;
+		zephyr,console = &lpuart6;
+		zephyr,shell-uart = &lpuart6;
+		zephyr,flash-controller = &is25wp128;
+		zephyr,flash = &sram0;
+		nxp,m4-partition = &slot1_partition;
+		zephyr,ipc = &mailbox_b;
+	};
+
+	sdram0: memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 DT_SIZE_M(64)>;
+	};
+};
+
+
+&lpuart6 {
+	status = "okay";
+	pinctrl-0 = <&pinmux_lpuart6>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+};
+
+/* GPT and Systick are enabled. If power management is enabled, the GPT
+ * timer will be used instead of systick, as allows the core clock to
+ * be gated.
+ */
+&gpt_hw_timer {
+	status = "okay";
+};
+
+&systick {
+	status = "okay";
+};
+
+&edma_lpsr0 {
+	status = "okay";
+};
+
+&mailbox_b {
+	status = "okay";
+};

@@ -1,0 +1,29 @@
+#
+# Copyright (c) 2024, Embedded Artists
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+identifier: ea_rt1176_kit_cm7
+name: Embedded Artists iMX RT1176 Kit CM7
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+ram: 256
+flash: 16384
+supported:
+  - adc
+  - counter
+  - dma
+  - gpio
+  - hwinfo
+  - i2c
+  - netif:eth
+  - pwm
+  - spi
+  - usb_device
+  - watchdog
+vendor: nxp

@@ -1,0 +1,12 @@
+# Copyright 2024, Embedded Artists
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_EA_RT1176_KIT_CM7
+	bool "Embedded Artists iMX RT1176 CM7"
+	depends on SOC_MIMXRT1176_CM7
+	select SOC_PART_NUMBER_MIMXRT1176CVM8A
+
+config BOARD_EA_RT1176_KIT_CM4
+	bool "Embedded Artists iMX RT1176 CM4"
+	depends on SOC_MIMXRT1176_CM4
+	select SOC_PART_NUMBER_MIMXRT1176CVM8A
